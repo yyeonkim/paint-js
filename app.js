@@ -2,14 +2,21 @@ const canvas = document.getElementById("jsCanvas");
 const colors = document.getElementsByClassName("jsColor");
 const ctx = canvas.getContext("2d");
 const range = document.getElementById("jsRange");
+const mode = document.getElementById("jsMode");
 
-ctx.width = document.getElementsByClassName("canvas")[0].offsetWidth;
-ctx.height = document.getElementsByClassName("canvas")[0].offsetHeight;
+const INITIAL_COLOR = "#2c2c2c";
 
-ctx.strokeStyle = "#2c2c2c";
+canvas.width = document.getElementsByClassName("canvas")[0].offsetWidth;
+canvas.height = document.getElementsByClassName("canvas")[0].offsetHeight;
+
+ctx.fillStyle = INITIAL_COLOR;
+ctx.strokeStyle = INITIAL_COLOR;
 ctx.lineWidth = 2.5;
 
+console.log(ctx.width);
+
 let painting = false;
+let filling = false;
 
 function stopPainting() {
     painting = false;
@@ -36,6 +43,7 @@ function onMouseMove(event) {
 function handleColorClick(event) {
     const color = event.target.style.backgroundColor;
     ctx.strokeStyle = color;
+    ctx.fillStyle = color;
 }
 
 function handleRangeChange(event) {
@@ -43,15 +51,36 @@ function handleRangeChange(event) {
     ctx.lineWidth = size;
 }
 
+function handleModeClick(event) {
+    if (filling === true) {
+        filling = false;
+        mode.innerText = "Fill";
+    } else {
+        filling = true;
+        mode.innerText = "Paint";
+    }
+}
+
+function handleCanvasClick() {
+    if (filling === true) {
+        ctx.fillRect(0, 0, canvas.width, canvas.height);  //canvas 기준 좌표
+    }
+}
+
 if (canvas) {
     canvas.addEventListener("mousemove", onMouseMove);
     canvas.addEventListener("mousedown", startPainting);
     canvas.addEventListener("mouseup", stopPainting);
     canvas.addEventListener("mouseleave", stopPainting);
+    canvas.addEventListener("click", handleCanvasClick);
 }
 
 Array.from(colors).forEach(color => color.addEventListener("click", handleColorClick));
 
 if(range) { //range가 비어있을 수 있으니까 확인 차 작성
     range.addEventListener("input", handleRangeChange);
+}
+
+if(mode) {
+    mode.addEventListener("click", handleModeClick);
 }
